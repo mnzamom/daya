@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl" class="h-full select-none">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>زیکرەکان - Azkar App</title>
+  
+  <!-- PWA Configuration -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#050505">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- iOS Safari PWA Integration -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="زیکرەکان">
+  <link rel="apple-touch-icon" href="images/icon-192.png">
+  <link rel="apple-touch-startup-image" href="images/icon-512.png">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Vazirmatn', 'Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts for Kurdish (Vazirmatn), Numbers (Outfit) & Amiri for Calligraphy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Outfit:wght@500;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Prevent default mobile browser bounce and scroll behavior */
+    html, body {
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      touch-action: none; /* Disables double-tap zoom and pull-to-refresh */
+      background-color: #050505;
+      -webkit-tap-highlight-color: transparent; /* Disable default tap highlight */
+    }
+
+    /* Waveform Animation Keyframes */
+    @keyframes bounce {
+      0%, 100% {
+        transform: scaleY(0.12);
+      }
+      50% {
+        transform: scaleY(1.0);
+      }
+    }
+
+    /* Active waveform styles */
+    .bar {
+      transform-origin: bottom;
+      height: 100%;
+      animation: bounce 1.2s ease-in-out infinite;
+      animation-play-state: paused;
+    }
+
+    /* Stagger the waveform animation bars for a dancing effect */
+    .bar:nth-child(1)  { animation-delay: 0.1s; animation-duration: 0.9s; }
+    .bar:nth-child(2)  { animation-delay: 0.4s; animation-duration: 1.3s; }
+    .bar:nth-child(3)  { animation-delay: 0.2s; animation-duration: 1.0s; }
+    .bar:nth-child(4)  { animation-delay: 0.6s; animation-duration: 1.5s; }
+    .bar:nth-child(5)  { animation-delay: 0.3s; animation-duration: 0.8s; }
+    .bar:nth-child(6)  { animation-delay: 0.8s; animation-duration: 1.6s; }
+    .bar:nth-child(7)  { animation-delay: 0.5s; animation-duration: 1.1s; }
+    .bar:nth-child(8)  { animation-delay: 0.2s; animation-duration: 1.4s; }
+    .bar:nth-child(9)  { animation-delay: 0.7s; animation-duration: 1.0s; }
+    .bar:nth-child(10) { animation-delay: 0.1s; animation-duration: 1.2s; }
+    .bar:nth-child(11) { animation-delay: 0.4s; animation-duration: 0.9s; }
+    .bar:nth-child(12) { animation-delay: 0.9s; animation-duration: 1.7s; }
+
+    /* Custom scrollbar reset */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Premium visual effects */
+    .premium-glow {
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Reciter Selector Styles */
+    .reciter-btn {
+      flex: 1 1 0%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 4px;
+      border-radius: 12px;
+      background-color: transparent;
+      border: 1px solid transparent;
+      opacity: 0.45;
+      transform: scale(1);
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .reciter-btn:hover {
+      opacity: 0.75;
+    }
+    .reciter-btn:active {
+      transform: scale(0.96);
+    }
+    .reciter-btn.active {
+      background-color: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.02);
+      opacity: 1;
+    }
+    .reciter-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 9999px;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      padding: 2px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: #0c0c0c;
+    }
+    .reciter-btn.active .reciter-avatar {
+      border-color: #34d399; /* emerald-400 */
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.3);
+      transform: scale(1.05);
+    }
+    .reciter-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 9999px;
+      object-fit: cover;
+      filter: grayscale(100%);
+      opacity: 0.65;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .reciter-btn.active .reciter-img {
+      filter: grayscale(0%);
+      opacity: 1;
+    }
+    .reciter-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8c8c8c; /* neutral-400 */
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .reciter-btn.active .reciter-label {
+      font-weight: 800;
+      color: #34d399; /* emerald-400 */
+    }
+
+    /* Bismillah Beautiful Styling */
+    .bismillah-text {
+      font-family: 'Amiri', serif;
+      font-size: 1.625rem; /* ~26px */
+      font-weight: 700;
+      text-align: center;
+      background: linear-gradient(135deg, #fef08a 0%, #fef3c7 40%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 2px 10px rgba(245, 158, 11, 0.2));
+      letter-spacing: 0.02em;
+      padding: 6px 0;
+      margin-bottom: 2px;
+      line-height: 1.35;
+      display: inline-block;
+      width: 100%;
+    }
+
+    /* Player Close Button - Red Theme for easy exit */
+    .player-close-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 2px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+    }
+    .player-close-btn:hover {
+      background-color: rgba(239, 68, 68, 0.3);
+      color: #ffffff;
+      border-color: rgba(239, 68, 68, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+    }
+    .player-close-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Voice Guide Toggle Button */
+    .voice-guide-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(16, 185, 129, 0.12);
+      border: 2px solid rgba(16, 185, 129, 0.3);
+      color: #a7f3d0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+    }
+    .voice-guide-btn:hover {
+      background-color: rgba(16, 185, 129, 0.25);
+      color: #ffffff;
+      border-color: rgba(16, 185, 129, 0.55);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.2);
+    }
+    .voice-guide-btn:active {
+      transform: scale(0.92);
+    }
+    .voice-guide-btn.muted {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.4);
+      box-shadow: none;
+    }
+    .voice-guide-btn.muted:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Player Navigation Buttons (Prev/Next) */
+    .player-ctrl-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .player-ctrl-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: scale(1.06);
+    }
+    .player-ctrl-btn:active {
+      transform: scale(0.92);
+    }
+    
+    /* Play/Pause Button - Green when paused (click to play), White/Red when playing */
+    .player-play-btn {
+      width: 96px;
+      height: 96px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom, #ffffff 0%, #e4e4e7 100%);
+      color: #09090b; /* zinc-950 */
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      outline: none;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    .player-play-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.5), 0 0 35px rgba(255, 255, 255, 0.3);
+    }
+    .player-play-btn:active {
+      transform: scale(0.95);
+    }
+    .player-play-btn.is-paused {
+      background: linear-gradient(to bottom, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4), 0 0 30px rgba(16, 185, 129, 0.35);
+    }
+    .player-play-btn.is-paused:hover {
+      box-shadow: 0 12px 30px -5px rgba(16, 185, 129, 0.5), 0 0 35px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Timeline Dots - Big, numbered, elderly-friendly buttons */
+    .player-dot {
+      width: 48px;
+      height: 48px;
+      border-radius: 9999px;
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .player-dot:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .player-dot.active {
+      background: linear-gradient(to bottom, #fcd34d 0%, #f59e0b 100%); /* Gold/amber active */
+      color: #09090b;
+      border-color: #fef08a;
+      transform: scale(1.18);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Player Reciter Avatar */
+    .player-avatar-container {
+      width: 170px;
+      height: 170px;
+      border-radius: 9999px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      padding: 4px;
+      background-color: #0d0d0d;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.05);
+      position: relative;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .player-avatar-container.active-playing {
+      border-color: #10b981; /* Emerald active playing ring */
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.35), 0 12px 36px rgba(0, 0, 0, 0.6);
+    }
+    .player-avatar-container.active-paused {
+      border-color: #f59e0b; /* Amber paused ring */
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.2), 0 12px 36px rgba(0, 0, 0, 0.6);
+    }
+  </style>
+</head>
+<body class="h-full flex items-center justify-center overflow-hidden">
+
+  <!-- main wrapper to enforce mobile-only view -->
+  <div class="relative w-full h-full max-w-md bg-neutral-950 flex flex-col overflow-hidden max-h-[100dvh] min-h-[100dvh] shadow-2xl">
+    
+    <!-- HEADER -->
+    <header class="flex flex-col gap-2 px-6 pt-4 pb-2 border-b border-white/[0.04] bg-neutral-950/45 backdrop-blur-md z-10 shrink-0 select-none shadow-[0_4px_20px_rgba(0,0,0,0.2)] items-center text-center">
+      
+      <!-- Bismillah Calligraphy -->
+      <div class="bismillah-text">
+        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+      </div>
+
+      <!-- RECITER SECTION -->
+      <div class="flex flex-col gap-2 mt-0.5 w-full">
+        <div class="flex justify-center px-1">
+          <span class="text-[10px] text-neutral-400 font-bold tracking-wider">دەنگی خوێنەران</span>
+        </div>
+        
+        <!-- RECITER SELECTOR (Avatar Photos - Local Paths) -->
+        <div class="flex justify-between bg-neutral-900/30 p-1 rounded-2xl border border-white/[0.04] gap-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+          
+          <!-- Voice 1: Mishary Al-Afasy -->
+          <button id="btn-reciter-alafasy" class="reciter-btn active" aria-label="دەنگی یەکەم: مشاری عەفاسی">
+            <div id="circle-alafasy" class="reciter-avatar">
+              <img src="images/alafasy.jpg" alt="مشاری عەفاسی" class="reciter-img">
+            </div>
+            <span id="label-alafasy" class="reciter-label">عەفاسی</span>
+          </button>
+
+          <!-- Voice 2: Mohammad Jibreel -->
+          <button id="btn-reciter-jibreel" class="reciter-btn" aria-label="دەنگی دووەم: محەمەد جبرائیل">
+            <div id="circle-jibreel" class="reciter-avatar">
+              <img src="images/jibreel.jpg" alt="محەمەد جبرائیل" class="reciter-img">
+            </div>
+            <span id="label-jibreel" class="reciter-label">جبرائیل</span>
+          </button>
+
+          <!-- Voice 3: Nasser Al-Qatami -->
+          <button id="btn-reciter-qatami" class="reciter-btn" aria-label="دەنگی سێیەم: ناسر ئەلقەتامی">
+            <div id="circle-qatami" class="reciter-avatar">
+              <img src="images/qatami.jpg" alt="ناسر ئەلقەتامی" class="reciter-img">
+            </div>
+            <span id="label-qatami" class="reciter-label">ئەلقەتامی</span>
+          </button>
+
+          <!-- Voice 4: Fares Abbad -->
+          <button id="btn-reciter-abbad" class="reciter-btn" aria-label="دەنگی چوارەم: فارس عەبباد">
+            <div id="circle-abbad" class="reciter-avatar">
+              <img src="images/abbad.jpg" alt="فارس عەبباد" class="reciter-img">
+            </div>
+            <span id="label-abbad" class="reciter-label">عەبباد</span>
+          </button>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN MENU (3 Realistic Sky Cards) -->
+    <main class="flex-1 flex flex-col p-4 gap-4 overflow-hidden justify-between select-none">
+      
+      <!-- Morning Remembrance Card (Realistic Golden Sunrise Sky) -->
+      <button id="card-morning" class="flex-1 flex flex-col items-center justify-center rounded-3xl relative overflow-hidden transition-all duration-300 transform active:scale-95 active:shadow-inner premium-glow group focus:outline-none text-white" 
+              style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.55)), url('https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=80&w=600&auto=format&fit=crop'); background-size: cover; background-position: center;"
+              aria-label="زیکری بەیانیان - Morning remembrance">
+        <!-- Sun decoration overlay -->
+        <div class="absolute -right-12 -top-12 w-40 h-40 rounded-full bg-amber-400/25 blur-xl group-active:scale-110 transition-transform duration-300"></div>
+        <div class="z-10 flex flex-col items-center gap-3">
+          <!-- Giant Glowing Sun SVG -->
+          <div class="w-24 h-24 flex items-center justify-center bg-white/10 rounded-full p-2 animate-[pulse_4s_infinite] shadow-sm backdrop-blur-[2px] border border-white/10">
+            <svg class="w-16 h-16 text-yellow-300 drop-shadow-[0_0_10px_rgba(253,224,71,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" />
+            </svg>
+          </div>
+          <span class="text-3xl font-black tracking-wide font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">زیکری بەیانیان</span>
+        </div>
+      </button>
+
+      <!-- Evening Remembrance Card (Realistic Twilight Sky) -->
+      <button id="card-evening" class="flex-1 flex flex-col items-center justify-center rounded-3xl relative overflow-hidden transition-all duration-300 transform active:scale-95 active:shadow-inner premium-glow group focus:outline-none text-white" 
+              style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=600&auto=format&fit=crop'); background-size: cover; background-position: center;"
+              aria-label="زیکری ئێواران - Evening remembrance">
+        <div class="absolute -left-12 -bottom-12 w-40 h-40 rounded-full bg-indigo-500/20 blur-xl group-active:scale-110 transition-transform duration-300"></div>
+        <div class="z-10 flex flex-col items-center gap-3">
+          <!-- Setting Sun SVG -->
+          <div class="w-24 h-24 flex items-center justify-center bg-white/10 rounded-full p-2 animate-[pulse_4s_infinite] shadow-sm backdrop-blur-[2px] border border-white/10">
+            <svg class="w-16 h-16 text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 17h18M6 20h12" />
+            </svg>
+          </div>
+          <span class="text-3xl font-black tracking-wide font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">زیکری ئێواران</span>
+        </div>
+      </button>
+
+      <!-- Night Remembrance Card (Realistic Starry Night Sky) -->
+      <button id="card-night" class="flex-1 flex flex-col items-center justify-center rounded-3xl relative overflow-hidden transition-all duration-300 transform active:scale-95 active:shadow-inner premium-glow group focus:outline-none text-white" 
+              style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url('images/night_sky.png'); background-size: cover; background-position: center;"
+              aria-label="زیکری شەوان - Night remembrance">
+        <div class="absolute -right-12 -bottom-12 w-40 h-40 rounded-full bg-indigo-950/45 blur-xl group-active:scale-110 transition-transform duration-300"></div>
+        <div class="z-10 flex flex-col items-center gap-3">
+          <!-- Crescent Moon & Stars SVG -->
+          <div class="w-24 h-24 flex items-center justify-center bg-white/5 rounded-full p-2 animate-[pulse_4s_infinite] shadow-sm backdrop-blur-[2px] border border-white/10">
+            <svg class="w-16 h-16 text-yellow-200 drop-shadow-[0_0_10px_rgba(254,240,138,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              <path fill="currentColor" d="M12 6l.4 1.2 1.2.2-.9.9.2 1.2-1.1-.6-1.1.6.2-1.2-.9-.9 1.2-.2L12 6z" />
+            </svg>
+          </div>
+          <span class="text-3xl font-black tracking-wide font-sans text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">زیکری شەوان</span>
+        </div>
+      </button>
+
+    </main>
+
+    <!-- FULL SCREEN PLAYER OVERLAY -->
+    <div id="player-overlay" class="absolute inset-0 z-50 transform translate-y-full transition-transform duration-500 ease-in-out flex flex-col select-none hidden">
+      <!-- Dynamic BG cover layer - Unblurred and high-visibility sky background for illiterate/elderly recognition -->
+      <div id="player-bg" class="absolute inset-0 transition-all duration-500 scale-100 opacity-95"></div>
+      <!-- Graduated dark overlay to protect text contrast while maintaining background visibility -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/15 via-neutral-950/60 to-neutral-950/95 z-0"></div>
+
+      <!-- Player Content Wrapper -->
+      <div class="relative z-10 flex-1 flex flex-col justify-between p-6">
+        
+        <!-- Top exit route & options -->
+        <div class="flex items-center justify-between h-16 shrink-0 z-10 w-full">
+          <button id="btn-close" class="player-close-btn" aria-label="بەرەو دواوە">
+            <!-- Large Back Arrow pointing down for RTL close -->
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <!-- Voice Guide Toggle Button -->
+          <button id="btn-voice-toggle" class="voice-guide-btn" aria-label="ڕێبەری دەنگی">
+            <!-- Speaker ON Icon -->
+            <svg id="icon-voice-on" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M12 18.75V5.25L7.75 9.5H4.5v5h3.25L12 18.75z" />
+            </svg>
+            <!-- Speaker OFF Icon -->
+            <svg id="icon-voice-off" class="w-7 h-7 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Center visuals -->
+        <div class="flex-1 flex flex-col items-center justify-center gap-10 shrink-0 z-10">
+          
+          <!-- Pulsing Reciter Avatar Frame with Category Badge Overlay -->
+          <div id="player-icon-container" class="player-avatar-container flex items-center justify-center relative">
+            <div id="player-icon-pulse" class="absolute inset-0 rounded-full border border-white/10 scale-100 opacity-0 transition-all duration-1000"></div>
+            
+            <!-- Reciter Photo -->
+            <img id="player-reciter-img" src="" alt="خوێنەر" class="w-full h-full rounded-full object-cover">
+            
+            <!-- Small Category Icon Badge (Sun/Sunset/Moon) in bottom-left -->
+            <div id="player-category-badge" class="absolute -bottom-1 -right-1 w-14 h-14 rounded-full bg-neutral-950 border-2 border-white/15 flex items-center justify-center p-2.5 shadow-xl backdrop-blur-md">
+              <div id="player-icon-content" class="w-full h-full flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]">
+                <!-- Instantiated category icon goes here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Waveform Visualizer -->
+          <div class="w-full max-w-xs flex flex-col items-center gap-4">
+            <div id="waveform" class="flex items-end justify-center gap-2 h-14 w-full">
+              <!-- 12 Waveform Bars -->
+              <span class="bar w-1.5 rounded-full bg-white opacity-70"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-75"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-80"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-85"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-90"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-95"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-95"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-90"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-85"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-80"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-75"></span>
+              <span class="bar w-1.5 rounded-full bg-white opacity-70"></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom Controls -->
+        <div class="flex flex-col items-center gap-8 pb-8 shrink-0 z-10 w-full">
+          
+          <!-- Segmented Timeline Progress Indicators -->
+          <div class="w-full px-4 flex flex-col items-center gap-4">
+            
+            <!-- Dynamic dots for each track segment -->
+            <div id="timeline-dots" class="flex justify-center gap-3 w-full">
+              <!-- Dots go here -->
+            </div>
+
+            <!-- Heavy/thick visual progress bar -->
+            <div class="w-full h-3 bg-white/10 rounded-full relative overflow-visible">
+              <div id="timeline-bar" class="h-full bg-gradient-to-r from-amber-200 to-white rounded-full w-0 transition-all duration-100 relative">
+                <!-- Glowing thumb indicator -->
+                <span class="absolute -right-3 -top-1.5 w-6 h-6 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)] border-2 border-neutral-900"></span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Playback Controls Grid -->
+          <div class="flex items-center justify-between w-full max-w-xs px-4 select-none">
+            
+            <!-- Previous Track Button -->
+            <button id="btn-prev" class="player-ctrl-btn" aria-label="پێشوو">
+              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <!-- Double chevron pointing right for RTL previous -->
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M6 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <!-- Play/Pause Toggle -->
+            <button id="btn-play-pause" class="player-play-btn is-paused" aria-label="لێدان یان وەستان">
+              <!-- Play Icon (visible by default when paused) -->
+              <svg id="icon-play" class="w-10 h-10 translate-x-[2px]" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <!-- Pause Icon (hidden by default) -->
+              <svg id="icon-pause" class="w-10 h-10 hidden" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+
+            <!-- Next Track Button -->
+            <button id="btn-next" class="player-ctrl-btn" aria-label="دواتر">
+              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <!-- Double chevron pointing left for RTL next -->
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7M18 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PWA Install Prompt for Android/Chrome -->
+    <div id="pwa-install-banner" class="absolute bottom-4 left-4 right-4 bg-neutral-900/95 border border-white/[0.08] p-4 rounded-2xl shadow-2xl z-40 hidden flex items-center justify-between backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <img src="images/icon-192.png" alt="Azkar Logo" class="w-12 h-12 rounded-xl border border-white/10">
+        <div class="flex flex-col">
+          <span class="text-sm font-bold text-white">ئەپی زیکرەکان دابەزێنە</span>
+          <span class="text-[10px] text-neutral-400">بۆ بەکارهێنانی خێرا و ئاسان</span>
+        </div>
+      </div>
+      <button id="btn-pwa-install" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg transition-all active:scale-95">دابەزاندن</button>
+    </div>
+
+    <!-- PWA iOS Safari Tutorial Overlay -->
+    <div id="pwa-ios-banner" class="absolute bottom-4 left-4 right-4 bg-neutral-900/95 border border-white/[0.08] p-4 rounded-2xl shadow-2xl z-40 hidden flex flex-col gap-3 backdrop-blur-md">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-3">
+          <img src="images/icon-192.png" alt="Azkar Logo" class="w-12 h-12 rounded-xl border border-white/10">
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-white">دابەزاندن لەسەر ئایفۆن</span>
+            <span class="text-[10px] text-neutral-400">ئەم ئەپە زیاد بکە بۆ سەر شاشە</span>
+          </div>
+        </div>
+        <button id="btn-close-ios-prompt" class="text-neutral-400 hover:text-white p-1">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-xs text-neutral-300 leading-relaxed border-t border-white/[0.04] pt-2 flex items-center gap-2">
+        <span>کلیک لەسەر دوگمەی</span>
+        <span class="inline-flex items-center justify-center bg-neutral-800 p-1.5 rounded-lg border border-white/5">
+          <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+        </span>
+        <span>هاوبەشکردن (Share) بکە و پاشان</span>
+        <span class="font-bold text-emerald-400">Add to Home Screen</span>
+        <span>هەڵبژێرە.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Audio Element -->
+  <audio id="main-audio" preload="auto"></audio>
+
+  <!-- JavaScript Player Logic -->
+  <script>
+    // Categories configuration with details, themes, and icons
+    const categories = {
+      morning: {
+        id: 'morning',
+        title: 'زیکری بەیانیان',
+        bgUrl: 'https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=80&w=600&auto=format&fit=crop',
+        textColorClass: 'text-amber-100',
+        icon: `
+          <svg class="w-24 h-24 text-yellow-300 drop-shadow-[0_0_10px_rgba(253,224,71,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" />
+          </svg>
+        `
+      },
+      evening: {
+        id: 'evening',
+        title: 'زیکری ئێواران',
+        bgUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=600&auto=format&fit=crop',
+        textColorClass: 'text-orange-100',
+        icon: `
+          <svg class="w-24 h-24 text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17h18M6 20h12" />
+          </svg>
+        `
+      },
+      night: {
+        id: 'night',
+        title: 'زیکری شەوان',
+        bgUrl: 'images/night_sky.png',
+        textColorClass: 'text-indigo-100',
+        icon: `
+          <svg class="w-24 h-24 text-yellow-200 drop-shadow-[0_0_10px_rgba(254,240,138,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            <path fill="currentColor" d="M12 6l.4 1.2 1.2.2-.9.9.2 1.2-1.1-.6-1.1.6.2-1.2-.9-.9 1.2-.2L12 6z" />
+          </svg>
+        `
+      }
+    };
+
+    // Reciter Configuration: Voice 1 (Alafasy), Voice 2 (Jibreel), Voice 3 (Qatami), Voice 4 (Abbad)
+    const reciters = {
+      alafasy: {
+        id: 'alafasy',
+        name: 'مشاری عەفاسی',
+        morning: {
+          audioUrl: 'https://archive.org/download/adkar_sabah_masae_safar/adkar_assbah.mp3',
+          landmarks: [0, 195, 400, 610, 825, 1020]
+        },
+        evening: {
+          audioUrl: 'https://archive.org/download/adkar_sabah_masae_safar/adkar_lmasaa.mp3',
+          landmarks: [0, 180, 380, 585, 790, 990]
+        },
+        night: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_11.mp3',
+          landmarks: [0, 90, 180, 270, 360, 435]
+        }
+      },
+      jibreel: {
+        id: 'jibreel',
+        name: 'محەمەد جبرائیل',
+        morning: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_07.mp3',
+          landmarks: [0, 220, 440, 660, 880, 1100]
+        },
+        evening: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_08.mp3',
+          landmarks: [0, 220, 440, 660, 880, 1100]
+        },
+        night: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_11.mp3',
+          landmarks: [0, 90, 180, 270, 360, 435]
+        }
+      },
+      qatami: {
+        id: 'qatami',
+        name: 'ناسر ئەلقەتامی',
+        morning: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_02.mp3',
+          landmarks: [0, 110, 220, 330, 440, 550]
+        },
+        evening: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_02.mp3',
+          landmarks: [0, 110, 220, 330, 440, 550]
+        },
+        night: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_11.mp3',
+          landmarks: [0, 90, 180, 270, 360, 435]
+        }
+      },
+      abbad: {
+        id: 'abbad',
+        name: 'فارس عەبباد',
+        morning: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_05.mp3',
+          landmarks: [0, 130, 260, 390, 520, 650]
+        },
+        evening: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_06.mp3',
+          landmarks: [0, 130, 260, 390, 520, 650]
+        },
+        night: {
+          audioUrl: 'https://archive.org/download/TvQuran.com__Athkar/TvQuran.com_athkar_11.mp3',
+          landmarks: [0, 90, 180, 270, 360, 435]
+        }
+      }
+    };
+
+    // State Variables
+    let activeReciter = localStorage.getItem('selectedReciter') || 'alafasy';
+    let activeCategory = null;
+    let currentLandmarkIndex = 0;
+    let voiceGuideEnabled = localStorage.getItem('voiceGuideEnabled') !== 'false';
+
+    // DOM Elements
+    const cardMorning = document.getElementById('card-morning');
+    const cardEvening = document.getElementById('card-evening');
+    const cardNight = document.getElementById('card-night');
+    const playerOverlay = document.getElementById('player-overlay');
+    const playerBg = document.getElementById('player-bg');
+    const btnClose = document.getElementById('btn-close');
+    const playerIconContent = document.getElementById('player-icon-content');
+    const playerIconPulse = document.getElementById('player-icon-pulse');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const timelineDotsContainer = document.getElementById('timeline-dots');
+    const timelineBar = document.getElementById('timeline-bar');
+    const mainAudio = document.getElementById('main-audio');
+    const waveformBars = document.querySelectorAll('#waveform .bar');
+
+    // New Accessible DOM Elements
+    const btnVoiceToggle = document.getElementById('btn-voice-toggle');
+    const iconVoiceOn = document.getElementById('icon-voice-on');
+    const iconVoiceOff = document.getElementById('icon-voice-off');
+    const playerReciterImg = document.getElementById('player-reciter-img');
+    const playerIconContainer = document.getElementById('player-icon-container');
+
+    // Reciter Switcher Buttons
+    const btnReciterAlafasy = document.getElementById('btn-reciter-alafasy');
+    const btnReciterJibreel = document.getElementById('btn-reciter-jibreel');
+    const btnReciterQatami = document.getElementById('btn-reciter-qatami');
+    const btnReciterAbbad = document.getElementById('btn-reciter-abbad');
+
+    // Kurdish/Fallback Voice Synthesis Engine
+    function speakText(text) {
+      if (!voiceGuideEnabled || !('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        
+        // Prioritize Kurdish (ckb/ku), then Persian (fa) or Arabic (ar) for phonetic alignment
+        let voice = voices.find(v => v.lang.startsWith('ku') || v.lang.startsWith('ckb'))
+                 || voices.find(v => v.lang.startsWith('fa'))
+                 || voices.find(v => v.lang.startsWith('ar'));
+                 
+        if (voice) {
+          utterance.voice = voice;
+          utterance.lang = voice.lang;
+        } else {
+          utterance.lang = 'fa-IR'; // Persian pronounces Kurdish glyphs very cleanly
+        }
+        
+        utterance.rate = 0.82; // Slower speed for elderly clarity
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn("Kurdish TTS Voice guide failed:", err);
+      }
+    }
+
+    // Initialize/Pre-load voices asynchronously
+    if ('speechSynthesis' in window && window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
+    // Haptic Feedback Helper
+    function triggerHaptic() {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+    }
+
+    // Update system lockscreen / bluetooth / headphone controls (Media Session API)
+    function updateMediaSession() {
+      if (!activeCategory || !('mediaSession' in navigator)) return;
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: activeCategory.title,
+          artist: reciters[activeReciter].name,
+          album: 'زیکرەکان - Azkar App',
+          artwork: [
+            { src: `images/${activeReciter}.jpg`, sizes: '256x256', type: 'image/jpeg' }
+          ]
+        });
+
+        // Map lockscreen & headphone controls to existing player functions
+        navigator.mediaSession.setActionHandler('play', () => {
+          mainAudio.play().then(() => setVisualPlaybackState(true));
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+          mainAudio.pause();
+          setVisualPlaybackState(false);
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', playPreviousLandmark);
+        navigator.mediaSession.setActionHandler('nexttrack', playNextLandmark);
+      } catch (err) {
+        console.warn("Media Session API setup error:", err);
+      }
+    }
+
+    // Initialize Card Event Listeners
+    cardMorning.addEventListener('click', () => startCategory('morning'));
+    cardEvening.addEventListener('click', () => startCategory('evening'));
+    cardNight.addEventListener('click', () => startCategory('night'));
+    btnClose.addEventListener('click', closePlayer);
+
+    // Audio Playback Listeners
+    btnPlayPause.addEventListener('click', togglePlayPause);
+    btnPrev.addEventListener('click', playPreviousLandmark);
+    btnNext.addEventListener('click', playNextLandmark);
+
+    mainAudio.addEventListener('timeupdate', updateProgress);
+    mainAudio.addEventListener('playing', () => setVisualPlaybackState(true));
+    mainAudio.addEventListener('pause', () => setVisualPlaybackState(false));
+    mainAudio.addEventListener('ended', handleAudioEnded);
+    mainAudio.addEventListener('error', handleAudioError);
+
+    // Reciter Selector Listeners
+    btnReciterAlafasy.addEventListener('click', () => changeReciter('alafasy'));
+    btnReciterJibreel.addEventListener('click', () => changeReciter('jibreel'));
+    btnReciterQatami.addEventListener('click', () => changeReciter('qatami'));
+    btnReciterAbbad.addEventListener('click', () => changeReciter('abbad'));
+
+    // Voice Toggle Click Listener
+    btnVoiceToggle.addEventListener('click', () => {
+      triggerHaptic();
+      voiceGuideEnabled = !voiceGuideEnabled;
+      localStorage.setItem('voiceGuideEnabled', voiceGuideEnabled);
+      updateVoiceToggleUI();
+      if (voiceGuideEnabled) {
+        speakText("ڕێبەری دەنگی چالاکە");
+      } else {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      }
+    });
+
+    // Update Speaker Icon UI state
+    function updateVoiceToggleUI() {
+      if (!btnVoiceToggle) return;
+      if (voiceGuideEnabled) {
+        btnVoiceToggle.classList.remove('muted');
+        iconVoiceOn.classList.remove('hidden');
+        iconVoiceOff.classList.add('hidden');
+      } else {
+        btnVoiceToggle.classList.add('muted');
+        iconVoiceOn.classList.add('hidden');
+        iconVoiceOff.classList.remove('hidden');
+      }
+    }
+
+    // Apply active reciter styles & Speaker toggle state on load
+    applyReciterUI();
+    updateVoiceToggleUI();
+
+    // Reciter toggle controller
+    function changeReciter(reciterKey) {
+      if (activeReciter === reciterKey) return;
+      triggerHaptic();
+      activeReciter = reciterKey;
+      localStorage.setItem('selectedReciter', reciterKey);
+      applyReciterUI();
+
+      // Speak chosen reciter name in Kurdish
+      speakText(`دەنگی ${reciters[activeReciter].name}`);
+
+      // Update system media sessions with new reciter metadata
+      updateMediaSession();
+
+      // If audio is currently playing in overlay, switch source instantly
+      if (activeCategory) {
+        const wasPlaying = !mainAudio.paused;
+        const currentCategoryKey = activeCategory.id;
+        
+        // Update photo display inside player
+        playerReciterImg.src = `images/${activeReciter}.jpg`;
+        playerReciterImg.alt = reciters[activeReciter].name;
+        
+        mainAudio.pause();
+        const audioData = reciters[activeReciter][currentCategoryKey];
+        mainAudio.src = audioData.audioUrl;
+        mainAudio.load();
+        
+        currentLandmarkIndex = 0;
+        renderTimelineDots();
+
+        if (wasPlaying) {
+          mainAudio.play()
+            .then(() => setVisualPlaybackState(true))
+            .catch(err => {
+              console.warn(err);
+              setVisualPlaybackState(false);
+            });
+        }
+      }
+    }
+
+    // Apply active styles to the reciter button dynamically
+    function applyReciterUI() {
+      const allReciters = ['alafasy', 'jibreel', 'qatami', 'abbad'];
+
+      allReciters.forEach(key => {
+        const btn = document.getElementById(`btn-reciter-${key}`);
+        if (btn) {
+          if (key === activeReciter) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        }
+      });
+    }
+
+    // Start playing remembrance category
+    function startCategory(catKey) {
+      triggerHaptic();
+      activeCategory = categories[catKey];
+      currentLandmarkIndex = 0;
+
+      // Set Player Overlay Background (Clear, unblurred sky photo matching the remembrance time)
+      playerBg.style.backgroundImage = `url('${activeCategory.bgUrl}')`;
+      playerBg.style.backgroundSize = 'cover';
+      playerBg.style.backgroundPosition = 'center';
+      
+      playerOverlay.className = `absolute inset-0 z-50 transform translate-y-full transition-transform duration-500 ease-in-out flex flex-col select-none ${activeCategory.textColorClass}`;
+      
+      // Set the center active reciter photo
+      playerReciterImg.src = `images/${activeReciter}.jpg`;
+      playerReciterImg.alt = reciters[activeReciter].name;
+
+      // Inject category icon badge
+      playerIconContent.innerHTML = activeCategory.icon;
+
+      // Render timeline landmarks
+      renderTimelineDots();
+
+      // Configure Audio Source
+      const audioData = reciters[activeReciter][catKey];
+      mainAudio.src = audioData.audioUrl;
+      mainAudio.load();
+
+      // Register system media control session
+      updateMediaSession();
+
+      // Open screen overlay
+      playerOverlay.classList.remove('hidden');
+      setTimeout(() => {
+        playerOverlay.classList.remove('translate-y-full');
+      }, 20);
+
+      // Play audio
+      mainAudio.play()
+        .then(() => {
+          setVisualPlaybackState(true);
+        })
+        .catch(err => {
+          console.warn("Autoplay was blocked or audio failed to load: ", err);
+          setVisualPlaybackState(false);
+        });
+
+      // Announce category and reciter in Kurdish
+      setTimeout(() => {
+        speakText(`${activeCategory.title} بە دەنگی ${reciters[activeReciter].name}`);
+      }, 650);
+    }
+
+    // Close Audio Player and cleanup
+    function closePlayer() {
+      triggerHaptic();
+      mainAudio.pause();
+      mainAudio.removeAttribute('src'); // Stop stream buffering immediately
+      mainAudio.load();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      playerOverlay.classList.add('translate-y-full');
+      setVisualPlaybackState(false);
+
+      // Hide overlay element after transition completes
+      setTimeout(() => {
+        playerOverlay.classList.add('hidden');
+        activeCategory = null;
+      }, 500);
+    }
+
+    // Play/Pause toggle control
+    function togglePlayPause() {
+      triggerHaptic();
+      if (mainAudio.paused) {
+        mainAudio.play()
+          .then(() => setVisualPlaybackState(true))
+          .catch(err => console.error("Playback failed: ", err));
+      } else {
+        mainAudio.pause();
+        setVisualPlaybackState(false);
+        speakText("وەستا");
+      }
+    }
+
+    // Set the overall visual state of the player controls and animations
+    function setVisualPlaybackState(isPlaying) {
+      if (isPlaying) {
+        iconPlay.classList.add('hidden');
+        iconPause.classList.remove('hidden');
+        btnPlayPause.classList.remove('is-paused');
+        playerIconContainer.classList.add('active-playing');
+        playerIconContainer.classList.remove('active-paused');
+        playerIconPulse.classList.add('animate-[ping_2s_infinite]');
+        waveformBars.forEach(bar => {
+          bar.style.animationPlayState = 'running';
+        });
+      } else {
+        iconPlay.classList.remove('hidden');
+        iconPause.classList.add('hidden');
+        btnPlayPause.classList.add('is-paused');
+        playerIconContainer.classList.remove('active-playing');
+        playerIconContainer.classList.add('active-paused');
+        playerIconPulse.classList.remove('animate-[ping_2s_infinite]');
+        waveformBars.forEach(bar => {
+          bar.style.animationPlayState = 'paused';
+        });
+      }
+    }
+
+    // Render large clickable/touchable navigation dots based on current reciter configuration
+    function renderTimelineDots() {
+      timelineDotsContainer.innerHTML = '';
+      if (!activeCategory) return;
+
+      const audioData = reciters[activeReciter][activeCategory.id];
+
+      audioData.landmarks.forEach((landmarkTime, idx) => {
+        const dot = document.createElement('button');
+        dot.className = `player-dot`;
+        dot.setAttribute('aria-label', `بەش - Section ${idx + 1}`);
+        
+        dot.innerHTML = `<span>${idx + 1}</span>`;
+
+        // Direct clicking/tapping on dots allowed for fast seeking
+        dot.addEventListener('click', () => {
+          triggerHaptic();
+          seekToLandmark(idx);
+        });
+
+        timelineDotsContainer.appendChild(dot);
+      });
+      
+      updateTimelineVisuals(0);
+    }
+
+    // Seek helper to specific landmark index
+    function seekToLandmark(idx) {
+      if (!activeCategory) return;
+      
+      const audioData = reciters[activeReciter][activeCategory.id];
+      currentLandmarkIndex = Math.max(0, Math.min(idx, audioData.landmarks.length - 1));
+      const targetTime = audioData.landmarks[currentLandmarkIndex];
+      mainAudio.currentTime = targetTime;
+      
+      if (mainAudio.paused) {
+        mainAudio.play()
+          .then(() => setVisualPlaybackState(true));
+      }
+      
+      updateTimelineVisuals(targetTime);
+
+      // Announce the active section in Kurdish
+      const kurdishNumbers = ["یەکەم", "دووەم", "سێیەم", "چوارەم", "پێنجەم", "شەشەم", "حەوتەم", "هەشتەم", "نۆیەم", "دەیەم"];
+      const secName = kurdishNumbers[idx] || (idx + 1);
+      speakText(`بەشی ${secName}`);
+    }
+
+    // Skip to previous track landmark
+    function playPreviousLandmark() {
+      triggerHaptic();
+      if (!activeCategory) return;
+      
+      const audioData = reciters[activeReciter][activeCategory.id];
+      const currentSegmentStart = audioData.landmarks[currentLandmarkIndex];
+      
+      if (mainAudio.currentTime - currentSegmentStart > 3) {
+        seekToLandmark(currentLandmarkIndex);
+      } else {
+        seekToLandmark(currentLandmarkIndex - 1);
+      }
+    }
+
+    // Skip to next track landmark
+    function playNextLandmark() {
+      triggerHaptic();
+      if (!activeCategory) return;
+      
+      const audioData = reciters[activeReciter][activeCategory.id];
+      
+      if (currentLandmarkIndex < audioData.landmarks.length - 1) {
+        seekToLandmark(currentLandmarkIndex + 1);
+      } else {
+        seekToLandmark(0);
+      }
+    }
+
+    // Update progress bar and highlight appropriate landmark dot
+    function updateProgress() {
+      if (!activeCategory || !mainAudio.duration) return;
+
+      const currentTime = mainAudio.currentTime;
+      const duration = mainAudio.duration;
+      const audioData = reciters[activeReciter][activeCategory.id];
+
+      const progressPercent = (currentTime / duration) * 100;
+      timelineBar.style.width = `${progressPercent}%`;
+
+      let activeIdx = 0;
+      for (let i = 0; i < audioData.landmarks.length; i++) {
+        if (currentTime >= audioData.landmarks[i]) {
+          activeIdx = i;
+        } else {
+          break;
+        }
+      }
+
+      if (activeIdx !== currentLandmarkIndex) {
+        currentLandmarkIndex = activeIdx;
+      }
+
+      updateTimelineVisuals(currentTime);
+    }
+
+    // Update the visual representation of active dot and timeline highlights
+    function updateTimelineVisuals(currentTime) {
+      if (!activeCategory) return;
+
+      const dots = timelineDotsContainer.children;
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+        if (i === currentLandmarkIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      }
+    }
+
+    // End of playback handling
+    function handleAudioEnded() {
+      closePlayer();
+    }
+
+    // Audio stream loading failure handler
+    function handleAudioError(e) {
+      console.error("Audio error encountered:", e);
+      alert("ھەڵەیەک ڕوویدا لە بارکردنی دەنگەکە. تکایە هێڵی ئینتەرنێتەکەت بپشکنە.");
+      closePlayer();
+    }
+
+    // Safe prevention of window bouncing/scrolling in iOS Safari
+    document.addEventListener('touchmove', function (e) {
+      if (!e.target.closest('button') && !e.target.closest('#timeline-dots')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // ==========================================
+    // PROGRESSIVE WEB APP (PWA) INTEGRATION
+    // ==========================================
+
+    let deferredPrompt = null;
+    const pwaInstallBanner = document.getElementById('pwa-install-banner');
+    const btnPwaInstall = document.getElementById('btn-pwa-install');
+    const pwaIosBanner = document.getElementById('pwa-ios-banner');
+    const btnCloseIosPrompt = document.getElementById('btn-close-ios-prompt');
+
+    // Register Service Worker for offline asset caching
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registered successfully!', reg.scope))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+
+    // Android/Chrome Custom Installation Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent standard mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      
+      // Check if already in standalone display mode
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      
+      if (!isStandalone) {
+        // Show our beautiful custom installation banner
+        pwaInstallBanner.classList.remove('hidden');
+      }
+    });
+
+    btnPwaInstall.addEventListener('click', () => {
+      if (!deferredPrompt) return;
+      triggerHaptic();
+      // Show the native browser install prompt
+      deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the PWA install prompt');
+        } else {
+          console.log('User dismissed the PWA install prompt');
+        }
+        deferredPrompt = null;
+        pwaInstallBanner.classList.add('hidden');
+      });
+    });
+
+    // Handle appinstalled event
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('Azkar PWA was installed successfully!');
+      pwaInstallBanner.classList.add('hidden');
+    });
+
+    // iOS/Safari Native Installation Guide
+    function detectAndShowIosInstallGuide() {
+      // Detect if device is iOS (iPhone/iPad/iPod)
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      // Check if already running in standalone app mode
+      const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      // Check if user has closed the iOS prompt previously in this session
+      const iosPromptClosed = sessionStorage.getItem('iosPwaPromptClosed') === 'true';
+
+      if (isIos && !isStandalone && !iosPromptClosed) {
+        // Show the iOS guide popup
+        pwaIosBanner.classList.remove('hidden');
+      }
+    }
+
+    btnCloseIosPrompt.addEventListener('click', () => {
+      triggerHaptic();
+      pwaIosBanner.classList.add('hidden');
+      // Remember closure for this browser session so we don't annoy the user
+      sessionStorage.setItem('iosPwaPromptClosed', 'true');
+    });
+
+    // Run iOS Safari check on startup
+    detectAndShowIosInstallGuide();
+
+  </script>
+</body>
+</html>
